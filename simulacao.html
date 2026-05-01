@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HydroSync - Cada gota no momento certo</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Outfit', sans-serif; background: #f4f7f4; color: #1a2e1a; }
+
+  /* HEADER */
+  header { background: white; padding: 14px 24px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid #e0ebe0; position: sticky; top: 0; z-index: 100; }
+  .logo { display: flex; align-items: center; gap: 8px; font-size: 22px; font-weight: 700; }
+  .logo span.hydro { color: #1a2e1a; }
+  .logo span.sync { color: #1d9e75; }
+  .logo-icon { width: 36px; height: 36px; }
+  .tagline { font-size: 13px; color: #5f7a5f; margin-left: 4px; }
+
+  /* NAV */
+  nav { margin-left: auto; display: flex; gap: 8px; }
+  nav button { background: none; border: 1px solid transparent; padding: 8px 16px; border-radius: 8px; cursor: pointer; font-family: inherit; font-size: 14px; color: #3b6a3b; font-weight: 500; transition: all 0.2s; }
+  nav button:hover { background: #eaf3de; }
+  nav button.active { background: #1d9e75; color: white; border-color: #1d9e75; }
+
+  /* PAGES */
+  .page { display: none; padding: 24px; max-width: 900px; margin: 0 auto; }
+  .page.active { display: block; }
+
+  /* HOME */
+  .hero { background: linear-gradient(135deg, #1a2e1a 0%, #0f6e56 100%); border-radius: 16px; padding: 40px; color: white; margin-bottom: 24px; position: relative; overflow: hidden; }
+  .hero h1 { font-size: 32px; font-weight: 700; margin-bottom: 8px; }
+  .hero p { font-size: 16px; opacity: 0.85; margin-bottom: 24px; max-width: 480px; }
+  .hero-btn { background: #5dcaa5; color: #04342c; border: none; padding: 14px 28px; border-radius: 10px; font-family: inherit; font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+  .hero-btn:hover { background: #9fe1cb; transform: translateY(-1px); }
+  .hero-deco { position: absolute; right: 40px; top: 50%; transform: translateY(-50%); font-size: 100px; opacity: 0.15; }
+
+  .cards-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-bottom: 24px; }
+  .stat-card { background: white; border-radius: 12px; padding: 20px; border: 1px solid #d5e8d5; }
+  .stat-card .label { font-size: 13px; color: #5f7a5f; margin-bottom: 8px; }
+  .stat-card .value { font-size: 28px; font-weight: 700; color: #1d9e75; }
+  .stat-card .sub { font-size: 12px; color: #8aab8a; }
+
+  .section-title { font-size: 18px; font-weight: 600; margin-bottom: 16px; color: #1a2e1a; }
+
+  /* SIMULADOR */
+  .sim-card { background: white; border-radius: 14px; border: 1px solid #d5e8d5; padding: 28px; }
+  .steps { display: flex; gap: 0; margin-bottom: 28px; }
+  .step { flex: 1; text-align: center; position: relative; }
+  .step-circle { width: 32px; height: 32px; border-radius: 50%; background: #eaf3de; border: 2px solid #c0dd97; color: #3b6d11; font-weight: 600; font-size: 14px; display: flex; align-items: center; justify-content: center; margin: 0 auto 6px; transition: all 0.3s; }
+  .step.active .step-circle { background: #1d9e75; border-color: #1d9e75; color: white; }
+  .step.done .step-circle { background: #eaf3de; border-color: #1d9e75; color: #1d9e75; }
+  .step-label { font-size: 12px; color: #5f7a5f; }
+  .step.active .step-label { color: #1d9e75; font-weight: 600; }
+  .step::after { content: ''; position: absolute; top: 16px; left: calc(50% + 16px); right: calc(-50% + 16px); height: 2px; background: #d5e8d5; }
+  .step:last-child::after { display: none; }
+
+  .step-content { display: none; }
+  .step-content.active { display: block; }
+
+  .step-title { font-size: 17px; font-weight: 600; margin-bottom: 20px; color: #1a2e1a; }
+
+  .cultura-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 20px; }
+  .cultura-item { border: 2px solid #d5e8d5; border-radius: 10px; padding: 14px 8px; text-align: center; cursor: pointer; transition: all 0.2s; background: white; }
+  .cultura-item:hover { border-color: #1d9e75; background: #eaf3de; }
+  .cultura-item.selected { border-color: #1d9e75; background: #eaf3de; }
+  .cultura-icon { font-size: 30px; display: block; margin-bottom: 6px; }
+  .cultura-item span { font-size: 13px; font-weight: 500; color: #1a2e1a; }
+
+  .area-control { display: flex; align-items: center; gap: 16px; background: #f4f7f4; border-radius: 10px; padding: 12px 16px; width: fit-content; }
+  .area-btn { width: 36px; height: 36px; border-radius: 8px; border: 1px solid #c0dd97; background: white; font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; color: #1d9e75; font-weight: 600; transition: all 0.2s; }
+  .area-btn:hover { background: #eaf3de; }
+  .area-value { font-size: 16px; font-weight: 600; min-width: 80px; text-align: center; }
+
+  label { display: block; font-size: 14px; color: #5f7a5f; margin-bottom: 6px; margin-top: 16px; font-weight: 500; }
+  select, input[type="number"] { width: 100%; padding: 10px 14px; border: 1px solid #d5e8d5; border-radius: 8px; font-family: inherit; font-size: 15px; background: white; color: #1a2e1a; outline: none; transition: border 0.2s; }
+  select:focus, input[type="number"]:focus { border-color: #1d9e75; }
+
+  .btn-row { display: flex; gap: 12px; margin-top: 28px; }
+  .btn-primary { background: #1d9e75; color: white; border: none; padding: 13px 32px; border-radius: 10px; font-family: inherit; font-size: 15px; font-weight: 600; cursor: pointer; transition: all 0.2s; flex: 1; }
+  .btn-primary:hover { background: #0f6e56; }
+  .btn-secondary { background: white; color: #1d9e75; border: 2px solid #1d9e75; padding: 13px 32px; border-radius: 10px; font-family: inherit; font-size: 15px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+  .btn-secondary:hover { background: #eaf3de; }
+
+  /* RESUMO */
+  .resumo-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+  .resumo-table td { padding: 10px 14px; border-bottom: 1px solid #e8f0e8; font-size: 15px; }
+  .resumo-table td:first-child { color: #5f7a5f; font-weight: 500; }
+  .resumo-table td:last-child { font-weight: 600; }
+
+  .resultados { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 24px; }
+  .resultado-item { text-align: center; background: #f4f7f4; border-radius: 10px; padding: 16px; }
+  .resultado-item .label { font-size: 12px; color: #5f7a5f; margin-bottom: 4px; }
+  .resultado-item .val { font-size: 22px; font-weight: 700; color: #1d9e75; }
+  .resultado-item .unit { font-size: 12px; color: #8aab8a; }
+
+  .irrigacao-box { background: #eaf3de; border-radius: 10px; padding: 16px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+  .irrigacao-box .prox { font-size: 13px; color: #5f7a5f; }
+  .irrigacao-box .hora { font-size: 16px; font-weight: 700; color: #1d9e75; }
+  .irrigacao-box .qty { font-size: 22px; font-weight: 700; color: #1a2e1a; }
+
+  .fonte-agua { display: flex; gap: 12px; margin-bottom: 20px; }
+  .fonte-item { flex: 1; background: #f4f7f4; border-radius: 10px; padding: 14px; display: flex; align-items: center; gap: 10px; }
+  .fonte-item .icon { font-size: 24px; }
+  .fonte-item .fonte-info .label { font-size: 12px; color: #5f7a5f; }
+  .fonte-item .fonte-info .qty { font-size: 16px; font-weight: 700; color: #1a2e1a; }
+
+  /* DASHBOARD */
+  .dash-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+  .system-status { display: flex; align-items: center; gap: 8px; background: #eaf3de; border-radius: 10px; padding: 10px 16px; }
+  .dot { width: 10px; height: 10px; border-radius: 50%; background: #1d9e75; animation: pulse 2s infinite; }
+  @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+  .condicoes-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 20px; }
+  .cond-card { background: white; border: 1px solid #d5e8d5; border-radius: 12px; padding: 16px; }
+  .cond-card .c-label { font-size: 12px; color: #5f7a5f; margin-bottom: 4px; }
+  .cond-card .c-value { font-size: 24px; font-weight: 700; }
+  .cond-card .c-status { font-size: 12px; margin-top: 4px; font-weight: 500; }
+  .status-ok { color: #1d9e75; }
+  .status-warn { color: #ba7517; }
+  .status-low { color: #378add; }
+
+  .previsao { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 20px; }
+  .prev-card { background: white; border: 1px solid #d5e8d5; border-radius: 12px; padding: 14px; text-align: center; }
+  .prev-card .dia { font-size: 13px; color: #5f7a5f; margin-bottom: 8px; }
+  .prev-card .temps { font-size: 15px; font-weight: 600; }
+  .prev-card .chuva { font-size: 12px; color: #5f7a5f; }
+
+  /* Chart simples */
+  .chart-container { background: white; border: 1px solid #d5e8d5; border-radius: 12px; padding: 20px; }
+  .chart-title { font-size: 14px; font-weight: 600; margin-bottom: 16px; color: #1a2e1a; }
+  canvas { width: 100%; }
+
+  /* TOAST */
+  .toast { position: fixed; bottom: 24px; right: 24px; background: #1d9e75; color: white; padding: 14px 24px; border-radius: 12px; font-size: 15px; font-weight: 500; display: none; z-index: 999; box-shadow: 0 4px 20px rgba(29,158,117,0.3); }
+  .toast.show { display: block; animation: slideIn 0.3s ease; }
+  @keyframes slideIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* MOBILE */
+  @media (max-width: 600px) {
+    .cultura-grid { grid-template-columns: repeat(2, 1fr); }
+    .resultados { grid-template-columns: repeat(2, 1fr); }
+    .condicoes-grid { grid-template-columns: repeat(2, 1fr); }
+    .hero h1 { font-size: 24px; }
+    nav button { padding: 8px 10px; font-size: 13px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <svg class="logo-icon" viewBox="0 0 36 36" fill="none">
+    <path d="M18 4 C18 4 8 16 8 22 C8 28 12.7 32 18 32 C23.3 32 28 28 28 22 C28 16 18 4 18 4Z" fill="#1d9e75"/>
+    <path d="M18 14 C18 14 13 21 13 24 C13 27 15.2 29 18 29 C20.8 29 23 27 23 24 C23 21 18 14 18 14Z" fill="white" opacity="0.4"/>
+  </svg>
+  <div>
+    <div class="logo"><span class="hydro">HYDRO</span><span class="sync">SYNC</span></div>
+    <div class="tagline">Cada gota no momento certo.</div>
+  </div>
+  <nav>
+    <button class="active" onclick="showPage('home')">Início</button>
+    <button onclick="showPage('simulador')">Simulador</button>
+    <button onclick="showPage('dashboard')">Dashboard</button>
+  </nav>
+</header>
+
+<!-- HOME -->
+<div class="page active" id="page-home">
+  <div class="hero">
+    <h1>Simulador de Plantação</h1>
+    <p>Simule diferentes cenários e descubra como o HydroSync otimiza o uso de água e aumenta sua produtividade.</p>
+    <button class="hero-btn" onclick="showPage('simulador')">Iniciar Simulação</button>
+    <div class="hero-deco">💧</div>
+  </div>
+
+  <div class="cards-grid">
+    <div class="stat-card">
+      <div class="label">💧 Água economizada</div>
+      <div class="value">42%</div>
+      <div class="sub">por ciclo</div>
+    </div>
+    <div class="stat-card">
+      <div class="label">🌱 Produtividade</div>
+      <div class="value">28,5</div>
+      <div class="sub">ton/hectare</div>
+    </div>
+    <div class="stat-card">
+      <div class="label">🏠 Água disponível</div>
+      <div class="value">120 L</div>
+      <div class="sub">captada do ar</div>
+    </div>
+    <div class="stat-card">
+      <div class="label">⏰ Próx. irrigação</div>
+      <div class="value">06:00</div>
+      <div class="sub">amanhã</div>
+    </div>
+  </div>
+
+  <p class="section-title">Recursos do Simulador</p>
+  <div class="sim-card">
+    <ul style="list-style:none;display:flex;flex-direction:column;gap:14px;">
+      <li style="display:flex;gap:12px;align-items:flex-start;"><span style="font-size:20px;">🌾</span><span>Simule diferentes culturas, climas e tipos de solo</span></li>
+      <li style="display:flex;gap:12px;align-items:flex-start;"><span style="font-size:20px;">💡</span><span>Receba recomendações inteligentes de irrigação</span></li>
+      <li style="display:flex;gap:12px;align-items:flex-start;"><span style="font-size:20px;">📊</span><span>Veja o impacto na economia de água e na produtividade</span></li>
+      <li style="display:flex;gap:12px;align-items:flex-start;"><span style="font-size:20px;">📍</span><span>Planeje sua plantação com dados precisos</span></li>
+    </ul>
+  </div>
+</div>
+
+<!-- SIMULADOR -->
+<div class="page" id="page-simulador">
+  <div class="sim-card">
+    <div class="steps">
+      <div class="step active" id="step-ind-1"><div class="step-circle">1</div><div class="step-label">Cultura</div></div>
+      <div class="step" id="step-ind-2"><div class="step-circle">2</div><div class="step-label">Clima</div></div>
+      <div class="step" id="step-ind-3"><div class="step-circle">3</div><div class="step-label">Solo</div></div>
+      <div class="step" id="step-ind-4"><div class="step-circle">4</div><div class="step-label">Resumo</div></div>
+    </div>
+
+    <!-- STEP 1: Cultura -->
+    <div class="step-content active" id="sc-1">
+      <div class="step-title">1. Escolha a cultura</div>
+      <div class="cultura-grid">
+        <div class="cultura-item" onclick="selectCultura(this,'Alface')"><span class="cultura-icon">🥬</span><span>Alface</span></div>
+        <div class="cultura-item" onclick="selectCultura(this,'Tomate')"><span class="cultura-icon">🍅</span><span>Tomate</span></div>
+        <div class="cultura-item" onclick="selectCultura(this,'Milho')"><span class="cultura-icon">🌽</span><span>Milho</span></div>
+        <div class="cultura-item" onclick="selectCultura(this,'Cenoura')"><span class="cultura-icon">🥕</span><span>Cenoura</span></div>
+        <div class="cultura-item" onclick="selectCultura(this,'Feijão')"><span class="cultura-icon">🫘</span><span>Feijão</span></div>
+        <div class="cultura-item" onclick="selectCultura(this,'Mandioca')"><span class="cultura-icon">🌿</span><span>Mandioca</span></div>
+      </div>
+
+      <label>2. Área da plantação</label>
+      <div class="area-control">
+        <button class="area-btn" onclick="changeArea(-0.5)">−</button>
+        <span class="area-value" id="area-display">1,0 hectare</span>
+        <button class="area-btn" onclick="changeArea(0.5)">+</button>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn-primary" onclick="nextStep(2)">Próximo →</button>
+      </div>
+    </div>
+
+    <!-- STEP 2: Clima -->
+    <div class="step-content" id="sc-2">
+      <div class="step-title">3. Condições climáticas</div>
+
+      <label>Região</label>
+      <select id="regiao">
+        <option>Semiárido - Nordeste</option>
+        <option>Cerrado - Centro-Oeste</option>
+        <option>Sul - Rio Grande do Sul</option>
+        <option>Sudeste - São Paulo</option>
+        <option>Amazônia - Norte</option>
+      </select>
+
+      <label>Temperatura média (°C)</label>
+      <input type="number" id="temp" value="34" min="15" max="45">
+
+      <label>Umidade relativa do ar (%)</label>
+      <input type="number" id="umidade" value="35" min="10" max="100">
+
+      <label>Radiação solar</label>
+      <select id="radiacao">
+        <option>Alta</option>
+        <option>Média</option>
+        <option>Baixa</option>
+      </select>
+
+      <div class="btn-row">
+        <button class="btn-secondary" onclick="nextStep(1)">← Voltar</button>
+        <button class="btn-primary" onclick="nextStep(3)">Próximo →</button>
+      </div>
+    </div>
+
+    <!-- STEP 3: Solo -->
+    <div class="step-content" id="sc-3">
+      <div class="step-title">4. Tipo de solo</div>
+
+      <label>Tipo de solo</label>
+      <select id="solo">
+        <option>Solo arenoso</option>
+        <option>Solo argiloso</option>
+        <option>Solo humoso</option>
+        <option>Solo misto</option>
+      </select>
+
+      <label>Capacidade de retenção de água</label>
+      <select id="retencao">
+        <option>Baixa</option>
+        <option>Média</option>
+        <option>Alta</option>
+      </select>
+
+      <label>Matéria orgânica (%)</label>
+      <input type="number" id="materia" value="1.2" min="0" max="10" step="0.1">
+
+      <label>Profundidade efetiva (cm)</label>
+      <input type="number" id="profundidade" value="60" min="10" max="200">
+
+      <div class="btn-row">
+        <button class="btn-secondary" onclick="nextStep(2)">← Voltar</button>
+        <button class="btn-primary" onclick="calcularSimulacao()">Próximo →</button>
+      </div>
+    </div>
+
+    <!-- STEP 4: Resumo -->
+    <div class="step-content" id="sc-4">
+      <div class="step-title">Resumo da Simulação</div>
+
+      <table class="resumo-table">
+        <tr><td>Cultura</td><td id="r-cultura">—</td></tr>
+        <tr><td>Área</td><td id="r-area">—</td></tr>
+        <tr><td>Região</td><td id="r-regiao">—</td></tr>
+        <tr><td>Solo</td><td id="r-solo">—</td></tr>
+      </table>
+
+      <p class="section-title" style="margin-bottom:14px;">Resultados previstos</p>
+      <div class="resultados">
+        <div class="resultado-item">
+          <div class="label">Água necessária</div>
+          <div class="val" id="r-agua">—</div>
+          <div class="unit">L por ciclo</div>
+        </div>
+        <div class="resultado-item">
+          <div class="label">Economia HydroSync</div>
+          <div class="val" id="r-economia" style="color:#1d9e75;">—</div>
+          <div class="unit">de água</div>
+        </div>
+        <div class="resultado-item">
+          <div class="label">Produtividade estimada</div>
+          <div class="val" id="r-prod">—</div>
+          <div class="unit">ton/hectare</div>
+        </div>
+      </div>
+
+      <p style="font-weight:600;margin-bottom:12px;">Irrigação recomendada</p>
+      <div class="irrigacao-box">
+        <div><div class="prox">Próxima irrigação</div><div class="hora" id="r-hora">Amanhã - 06:00</div></div>
+        <div style="text-align:right;"><div class="prox">Quantidade</div><div class="qty" id="r-qty">180 L</div></div>
+      </div>
+
+      <p style="font-weight:600;margin-bottom:12px;">Fonte de água</p>
+      <div class="fonte-agua">
+        <div class="fonte-item">
+          <span class="icon">💧</span>
+          <div class="fonte-info">
+            <div class="label">Água captada do ar</div>
+            <div class="qty">120 L disponíveis</div>
+          </div>
+        </div>
+        <div class="fonte-item">
+          <span class="icon">🪣</span>
+          <div class="fonte-info">
+            <div class="label">Água da cisterna</div>
+            <div class="qty" id="r-cisterna">80 L disponíveis</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn-secondary" onclick="nextStep(3)">← Voltar</button>
+        <button class="btn-primary" onclick="iniciarSimulacao()">✅ Iniciar Simulação</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- DASHBOARD -->
+<div class="page" id="page-dashboard">
+  <div class="dash-header">
+    <p class="section-title" style="margin:0;">Simulação em andamento</p>
+    <div class="system-status">
+      <div class="dot"></div>
+      <span style="font-size:14px;font-weight:500;color:#1a2e1a;">Sistema ativo</span>
+    </div>
+  </div>
+
+  <div class="condicoes-grid">
+    <div class="cond-card">
+      <div class="c-label">Umidade do solo</div>
+      <div class="c-value" style="color:#378add;">32%</div>
+      <div class="c-status status-ok">Ideal: 30% – 60%</div>
+    </div>
+    <div class="cond-card">
+      <div class="c-label">Temperatura</div>
+      <div class="c-value" style="color:#e24b4a;">33°C</div>
+      <div class="c-status status-warn">Alta</div>
+    </div>
+    <div class="cond-card">
+      <div class="c-label">Umidade do ar</div>
+      <div class="c-value" style="color:#378add;">38%</div>
+      <div class="c-status status-low">Baixa</div>
+    </div>
+  </div>
+
+  <div class="cards-grid" style="margin-bottom:20px;">
+    <div class="stat-card" style="border-color:#c0dd97;">
+      <div class="label">⏰ Próxima irrigação</div>
+      <div class="value" style="font-size:20px;">Amanhã - 06:00</div>
+    </div>
+    <div class="stat-card" style="border-color:#c0dd97;">
+      <div class="label">💧 Quantidade prevista</div>
+      <div class="value">180 L</div>
+    </div>
+  </div>
+
+  <p class="section-title">Previsão do tempo</p>
+  <div class="previsao" style="margin-bottom:24px;">
+    <div class="prev-card">
+      <div class="dia">Hoje</div>
+      <div style="font-size:24px;">☀️</div>
+      <div class="temps">34°C / 24°C</div>
+      <div class="chuva">🌂 0%</div>
+    </div>
+    <div class="prev-card">
+      <div class="dia">Amanhã</div>
+      <div style="font-size:24px;">⛅</div>
+      <div class="temps">33°C / 23°C</div>
+      <div class="chuva">🌂 0%</div>
+    </div>
+    <div class="prev-card">
+      <div class="dia">Depois</div>
+      <div style="font-size:24px;">⛅</div>
+      <div class="temps">32°C / 22°C</div>
+      <div class="chuva">🌂 0%</div>
+    </div>
+  </div>
+
+  <div class="chart-container">
+    <div class="chart-title">Gráfico de umidade do solo (%)</div>
+    <canvas id="soilChart" height="160"></canvas>
+  </div>
+</div>
+
+<div class="toast" id="toast">✅ Simulação iniciada com sucesso!</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<script>
+  // Estado
+  let area = 1.0;
+  let culturaSelected = '';
+  let currentStep = 1;
+
+  function showPage(name) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+    document.getElementById('page-' + name).classList.add('active');
+    event.target.classList.add('active');
+    if (name === 'dashboard') drawChart();
+  }
+
+  function selectCultura(el, nome) {
+    document.querySelectorAll('.cultura-item').forEach(i => i.classList.remove('selected'));
+    el.classList.add('selected');
+    culturaSelected = nome;
+  }
+
+  function changeArea(delta) {
+    area = Math.max(0.5, Math.round((area + delta) * 10) / 10);
+    document.getElementById('area-display').textContent = area.toFixed(1).replace('.', ',') + ' hectare' + (area > 1 ? 's' : '');
+  }
+
+  function nextStep(n) {
+    document.querySelectorAll('.step-content').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.step').forEach((s, i) => {
+      s.classList.remove('active', 'done');
+      if (i + 1 < n) s.classList.add('done');
+      if (i + 1 === n) s.classList.add('active');
+    });
+    document.getElementById('sc-' + n).classList.add('active');
+    currentStep = n;
+  }
+
+  function calcularSimulacao() {
+    const cult = culturaSelected || 'Tomate';
+    const areaTxt = area.toFixed(1).replace('.', ',') + ' hectare' + (area > 1 ? 's' : '');
+    const regiao = document.getElementById('regiao').value;
+    const solo = document.getElementById('solo').value;
+
+    const agua = Math.round(12450 * area);
+    const economia = 42;
+    const prod = (28.5 * area).toFixed(1);
+    const qty = Math.round(180 * area);
+
+    document.getElementById('r-cultura').textContent = cult;
+    document.getElementById('r-area').textContent = areaTxt;
+    document.getElementById('r-regiao').textContent = regiao;
+    document.getElementById('r-solo').textContent = solo;
+    document.getElementById('r-agua').textContent = agua.toLocaleString('pt-BR');
+    document.getElementById('r-economia').textContent = economia + '%';
+    document.getElementById('r-prod').textContent = prod;
+    document.getElementById('r-qty').textContent = qty + ' L';
+
+    nextStep(4);
+  }
+
+  function iniciarSimulacao() {
+    const toast = document.getElementById('toast');
+    toast.classList.add('show');
+    setTimeout(() => { toast.classList.remove('show'); showDash(); }, 2000);
+  }
+
+  function showDash() {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+    document.getElementById('page-dashboard').classList.add('active');
+    document.querySelectorAll('nav button')[2].classList.add('active');
+    drawChart();
+  }
+
+  function drawChart() {
+    const existing = Chart.getChart('soilChart');
+    if (existing) existing.destroy();
+
+    const labels = ['-48h', '-42h', '-36h', '-30h', '-24h', '-18h', '-12h', '-6h', 'Agora'];
+    const data = [58, 52, 45, 48, 42, 38, 34, 30, 32];
+
+    new Chart(document.getElementById('soilChart'), {
+      type: 'line',
+      data: {
+        labels,
+        datasets: [{
+          data,
+          borderColor: '#1d9e75',
+          backgroundColor: 'rgba(29,158,117,0.1)',
+          fill: true,
+          tension: 0.4,
+          pointRadius: 4,
+          pointBackgroundColor: '#1d9e75',
+        }]
+      },
+      options: {
+        plugins: { legend: { display: false } },
+        scales: {
+          y: { min: 0, max: 100, grid: { color: '#e8f0e8' }, ticks: { font: { family: 'Outfit' } } },
+          x: { grid: { display: false }, ticks: { font: { family: 'Outfit' } } }
+        }
+      }
+    });
+  }
+</script>
+</body>
+</html>

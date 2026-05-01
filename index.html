@@ -1,0 +1,933 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HydroSync – Cada gota no momento certo</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #0d1f3c;
+    --green: #2ecc71;
+    --green-dark: #27ae60;
+    --blue: #1a7fd4;
+    --blue-light: #4fc3f7;
+    --white: #ffffff;
+    --gray-light: #f4f7fb;
+    --gray: #8899aa;
+    --text: #1a2940;
+    --accent: #00e5a0;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    color: var(--text);
+    background: var(--white);
+    overflow-x: hidden;
+  }
+
+  /* ===== NAV ===== */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 5%;
+    height: 64px;
+    background: rgba(255,255,255,0.92);
+    backdrop-filter: blur(14px);
+    border-bottom: 1px solid rgba(0,0,0,0.06);
+    transition: box-shadow .3s;
+  }
+  nav.scrolled { box-shadow: 0 4px 24px rgba(0,0,0,0.08); }
+
+  .logo {
+    font-family: 'Sora', sans-serif;
+    font-size: 1.4rem; font-weight: 800;
+    color: var(--navy);
+    display: flex; align-items: center; gap: 8px;
+    text-decoration: none;
+  }
+  .logo span { color: var(--green); }
+  .logo-icon { width: 32px; height: 32px; }
+
+  .nav-links {
+    display: flex; gap: 2rem; list-style: none;
+  }
+  .nav-links a {
+    font-size: .88rem; font-weight: 500;
+    color: var(--text); text-decoration: none;
+    transition: color .2s;
+  }
+  .nav-links a:hover { color: var(--green-dark); }
+
+  .btn-nav {
+    background: var(--green); color: #fff;
+    border: none; border-radius: 8px;
+    padding: 10px 20px;
+    font-family: 'Sora', sans-serif; font-size: .85rem; font-weight: 700;
+    cursor: pointer; transition: background .2s, transform .15s;
+    text-decoration: none;
+  }
+  .btn-nav:hover { background: var(--green-dark); transform: translateY(-1px); }
+
+  /* ===== HERO ===== */
+  #hero {
+    min-height: 100vh;
+    background: linear-gradient(135deg, var(--navy) 0%, #183a6e 55%, #0d4a3a 100%);
+    display: flex; align-items: center;
+    padding: 64px 5% 0;
+    position: relative; overflow: hidden;
+  }
+  #hero::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E") repeat;
+  }
+  .hero-content {
+    position: relative; z-index: 2;
+    max-width: 520px;
+    animation: fadeUp .9s ease both;
+  }
+  .hero-badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: rgba(46,204,113,.15); border: 1px solid rgba(46,204,113,.35);
+    border-radius: 100px; padding: 6px 14px;
+    font-size: .78rem; color: var(--accent); font-weight: 600;
+    margin-bottom: 1.5rem;
+    letter-spacing: .04em; text-transform: uppercase;
+  }
+  .hero-content h1 {
+    font-family: 'Sora', sans-serif;
+    font-size: clamp(2.8rem, 6vw, 4.8rem);
+    font-weight: 800; line-height: 1.04;
+    color: #fff;
+    margin-bottom: .6rem;
+  }
+  .hero-content h1 span { color: var(--accent); }
+  .hero-tagline {
+    font-size: 1.15rem; font-weight: 300; color: rgba(255,255,255,.75);
+    margin-bottom: 1.2rem; line-height: 1.5;
+  }
+  .hero-desc {
+    font-size: .95rem; color: rgba(255,255,255,.6);
+    line-height: 1.7; margin-bottom: 2.2rem; max-width: 420px;
+  }
+  .hero-btns { display: flex; gap: 1rem; flex-wrap: wrap; }
+  .btn-primary {
+    background: var(--green); color: #fff;
+    border: none; border-radius: 10px;
+    padding: 14px 28px;
+    font-family: 'Sora', sans-serif; font-size: .95rem; font-weight: 700;
+    cursor: pointer; transition: all .2s;
+    display: inline-flex; align-items: center; gap: 8px;
+    text-decoration: none;
+  }
+  .btn-primary:hover { background: var(--green-dark); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(46,204,113,.35); }
+  .btn-outline {
+    background: transparent; color: #fff;
+    border: 1.5px solid rgba(255,255,255,.4); border-radius: 10px;
+    padding: 14px 28px;
+    font-family: 'Sora', sans-serif; font-size: .95rem; font-weight: 600;
+    cursor: pointer; transition: all .2s;
+    display: inline-flex; align-items: center; gap: 8px;
+    text-decoration: none;
+  }
+  .btn-outline:hover { border-color: #fff; background: rgba(255,255,255,.08); }
+
+  .hero-visual {
+    position: absolute; right: 0; bottom: 0; top: 64px;
+    width: 52%;
+    display: flex; align-items: flex-end; justify-content: center;
+    overflow: hidden;
+  }
+  .hero-visual img {
+    width: 100%; height: 100%; object-fit: cover;
+    object-position: center bottom;
+    opacity: .85;
+  }
+  .hero-visual::before {
+    content: '';
+    position: absolute; inset: 0; z-index: 1;
+    background: linear-gradient(to right, var(--navy) 0%, transparent 40%),
+                linear-gradient(to top, var(--navy) 0%, transparent 30%);
+  }
+  .hero-tower {
+    position: absolute; right: 6%; bottom: 0; z-index: 2;
+    width: 280px;
+    animation: float 6s ease-in-out infinite;
+  }
+  .hero-stats {
+    position: absolute; bottom: 2.5rem; left: 5%; z-index: 3;
+    display: flex; gap: 2rem;
+    animation: fadeUp 1.2s ease .4s both;
+  }
+  .stat { text-align: left; }
+  .stat-val {
+    font-family: 'Sora', sans-serif; font-size: 1.8rem; font-weight: 800;
+    color: var(--accent);
+  }
+  .stat-lbl { font-size: .75rem; color: rgba(255,255,255,.55); margin-top: 2px; }
+
+  /* ===== COMO FUNCIONA ===== */
+  #como-funciona {
+    background: var(--gray-light);
+    padding: 100px 5%;
+  }
+  .section-tag {
+    display: flex; align-items: center; justify-content: center; gap: 12px;
+    margin-bottom: 1rem;
+  }
+  .section-tag::before,.section-tag::after {
+    content: ''; flex: 1; max-width: 60px;
+    height: 2px; background: var(--green);
+    border-radius: 2px;
+  }
+  .section-tag span {
+    font-family: 'Sora', sans-serif;
+    font-size: .78rem; font-weight: 700; letter-spacing: .14em;
+    text-transform: uppercase; color: var(--green-dark);
+  }
+  .section-title {
+    font-family: 'Sora', sans-serif;
+    font-size: clamp(1.6rem, 3vw, 2.4rem); font-weight: 800;
+    color: var(--navy); text-align: center; margin-bottom: 3.5rem;
+  }
+
+  .steps {
+    display: flex; gap: 0; justify-content: center;
+    flex-wrap: wrap;
+    position: relative;
+  }
+  .steps::before {
+    content: '';
+    position: absolute; top: 44px; left: 12%; right: 12%;
+    height: 2px;
+    background: repeating-linear-gradient(to right, var(--green) 0, var(--green) 8px, transparent 8px, transparent 20px);
+  }
+  .step {
+    flex: 1; min-width: 180px; max-width: 240px;
+    text-align: center; padding: 0 16px;
+    position: relative;
+    opacity: 0; transform: translateY(30px);
+    transition: opacity .6s ease, transform .6s ease;
+  }
+  .step.visible { opacity: 1; transform: translateY(0); }
+  .step-icon {
+    width: 88px; height: 88px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 1.2rem;
+    font-size: 2rem;
+    position: relative; z-index: 2;
+  }
+  .step:nth-child(1) .step-icon { background: #e8f4fd; }
+  .step:nth-child(2) .step-icon { background: #dff2ec; }
+  .step:nth-child(3) .step-icon { background: #e8f4fd; }
+  .step:nth-child(4) .step-icon { background: #dff2ec; }
+  .step-num {
+    position: absolute; top: -6px; right: -6px;
+    width: 26px; height: 26px; border-radius: 50%;
+    background: var(--green); color: #fff;
+    font-family: 'Sora', sans-serif; font-size: .7rem; font-weight: 800;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .step h3 {
+    font-family: 'Sora', sans-serif; font-size: .9rem; font-weight: 700;
+    color: var(--navy); margin-bottom: .5rem; text-transform: uppercase; letter-spacing: .04em;
+  }
+  .step p { font-size: .85rem; color: var(--gray); line-height: 1.6; }
+
+  /* ===== TECNOLOGIA ===== */
+  #tecnologia {
+    padding: 100px 5%;
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 80px; align-items: center;
+  }
+  .tech-text h2 {
+    font-family: 'Sora', sans-serif; font-size: clamp(1.6rem,3vw,2.4rem); font-weight: 800;
+    color: var(--navy); margin-bottom: 1rem;
+    border-left: 4px solid var(--green); padding-left: 16px;
+  }
+  .tech-text p { color: var(--gray); line-height: 1.8; margin-bottom: 1.5rem; font-size: .95rem; }
+  .feature-list { list-style: none; display: flex; flex-direction: column; gap: .75rem; margin-bottom: 2rem; }
+  .feature-list li {
+    display: flex; align-items: center; gap: 10px;
+    font-size: .9rem; color: var(--text);
+  }
+  .feature-list li::before {
+    content: '✓';
+    width: 22px; height: 22px; border-radius: 50%;
+    background: var(--green); color: #fff;
+    font-size: .65rem; font-weight: 800;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .btn-green {
+    background: var(--navy); color: #fff;
+    border: none; border-radius: 10px; padding: 13px 26px;
+    font-family: 'Sora', sans-serif; font-size: .9rem; font-weight: 700;
+    cursor: pointer; transition: all .2s; text-decoration: none; display: inline-block;
+  }
+  .btn-green:hover { background: var(--blue); transform: translateY(-2px); }
+
+  /* Phone mockup */
+  .phone-wrap {
+    display: flex; justify-content: center; align-items: center;
+    position: relative;
+  }
+  .phone {
+    width: 220px;
+    background: var(--navy);
+    border-radius: 36px;
+    padding: 16px 12px;
+    box-shadow: 0 40px 80px rgba(13,31,60,.35), 0 0 0 8px rgba(255,255,255,.06);
+    position: relative; z-index: 2;
+    animation: float 5s ease-in-out infinite;
+  }
+  .phone-inner {
+    background: #111d35; border-radius: 24px; overflow: hidden;
+    padding: 16px; font-family: 'Sora', sans-serif;
+  }
+  .phone-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+  .phone-logo { font-size: .7rem; font-weight: 800; color: #fff; }
+  .phone-logo span { color: var(--accent); }
+  .status-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); box-shadow: 0 0 8px var(--green); }
+  .phone-status { font-size: .6rem; color: rgba(255,255,255,.5); margin-bottom: 14px; }
+  .phone-status strong { color: var(--accent); }
+  .phone-metric { margin-bottom: 12px; }
+  .metric-lbl { font-size: .58rem; color: rgba(255,255,255,.5); margin-bottom: 2px; }
+  .metric-val { font-size: 1.4rem; font-weight: 800; color: #fff; }
+  .metric-bar { height: 4px; border-radius: 4px; background: rgba(255,255,255,.1); margin-top: 4px; overflow: hidden; }
+  .metric-fill { height: 100%; border-radius: 4px; background: linear-gradient(to right, var(--blue-light), var(--green)); }
+  .phone-next { font-size: .6rem; color: rgba(255,255,255,.45); margin-top: 10px; }
+  .phone-next strong { color: var(--blue-light); }
+  .solar-row { display: flex; align-items: center; justify-content: space-between; margin-top: 12px; background: rgba(255,255,255,.05); border-radius: 8px; padding: 8px 10px; }
+  .solar-lbl { font-size: .58rem; color: rgba(255,255,255,.5); }
+  .solar-val { font-size: .9rem; font-weight: 800; color: var(--accent); }
+  .glow-ring {
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
+    width: 320px; height: 320px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(46,204,113,.12) 0%, transparent 70%);
+    z-index: 1;
+  }
+
+  /* ===== SIMULAÇÃO ===== */
+  #simulacao {
+    background: var(--gray-light); padding: 80px 5%;
+  }
+  .sim-card {
+    max-width: 700px; margin: 0 auto;
+    background: #fff; border-radius: 20px;
+    padding: 32px; box-shadow: 0 8px 40px rgba(0,0,0,.07);
+  }
+  .sim-card h3 {
+    font-family: 'Sora', sans-serif; font-size: 1.1rem; font-weight: 800;
+    color: var(--navy); margin-bottom: 1.5rem;
+  }
+  .sim-row { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 1.5rem; }
+  .sim-chip {
+    display: flex; align-items: center; gap: 8px;
+    background: var(--gray-light); border-radius: 10px; padding: 10px 14px;
+    flex: 1; min-width: 140px;
+  }
+  .chip-icon { font-size: 1.2rem; }
+  .chip-lbl { font-size: .7rem; color: var(--gray); }
+  .chip-val { font-size: .88rem; font-weight: 700; color: var(--navy); }
+  .sim-metrics { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 1.5rem; }
+  .sim-metric { background: var(--gray-light); border-radius: 12px; padding: 14px; }
+  .sim-metric .lbl { font-size: .68rem; color: var(--gray); margin-bottom: 4px; }
+  .sim-metric .val { font-family: 'Sora', sans-serif; font-size: 1.3rem; font-weight: 800; color: var(--navy); }
+  .sim-metric .sub { font-size: .68rem; color: var(--gray); margin-top: 2px; }
+  .sim-metric .bar { height: 4px; border-radius: 4px; background: rgba(0,0,0,.07); margin-top: 8px; overflow: hidden; }
+  .sim-metric .fill-blue { height: 100%; background: var(--blue); border-radius: 4px; }
+  .sim-metric .fill-green { height: 100%; background: var(--green); border-radius: 4px; }
+  .tag-active {
+    display: inline-flex; align-items: center; gap: 5px;
+    background: #e6faf1; color: var(--green-dark); border-radius: 6px;
+    font-size: .72rem; font-weight: 700; padding: 4px 10px;
+  }
+  .sim-footer { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+  .next-irr { font-size: .85rem; color: var(--text); }
+  .next-irr strong { color: var(--blue); font-family: 'Sora', sans-serif; }
+
+  /* ===== O PROBLEMA ===== */
+  #problema {
+    background: var(--navy);
+    padding: 100px 5%;
+    position: relative; overflow: hidden;
+  }
+  #problema::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.02'%3E%3Cpath d='M0 0h80v80H0z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  }
+  .problema-header {
+    font-family: 'Sora', sans-serif; font-size: .78rem; font-weight: 700;
+    letter-spacing: .14em; text-transform: uppercase; color: var(--accent);
+    margin-bottom: 2rem;
+  }
+  .problema-grid {
+    display: grid; grid-template-columns: 1fr 2fr 1fr; gap: 40px;
+    align-items: start; position: relative; z-index: 1;
+  }
+  .prob-stat-big {
+    text-align: center;
+    background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.08);
+    border-radius: 16px; padding: 28px 16px;
+  }
+  .prob-stat-icon { font-size: 2rem; margin-bottom: 8px; }
+  .prob-stat-val {
+    font-family: 'Sora', sans-serif; font-size: 2.6rem; font-weight: 800;
+    color: #fff; margin-bottom: 4px;
+  }
+  .prob-stat-val.accent { color: var(--accent); }
+  .prob-stat-desc { font-size: .8rem; color: rgba(255,255,255,.55); line-height: 1.5; }
+  .prob-stat-source { font-size: .68rem; color: rgba(255,255,255,.3); margin-top: 6px; }
+  .prob-center { display: flex; flex-direction: column; gap: 16px; }
+  .prob-center-text {
+    font-size: 1.4rem; line-height: 1.6; color: rgba(255,255,255,.75);
+    font-weight: 300;
+  }
+  .prob-center-hl { color: #fff; font-weight: 400; }
+  .prob-big-quote {
+    font-family: 'Sora', sans-serif; font-size: clamp(1.2rem, 2.5vw, 1.8rem);
+    font-weight: 800; color: #fff; text-align: center;
+    padding: 40px 5%; border-top: 1px solid rgba(255,255,255,.08);
+    margin-top: 20px; position: relative; z-index: 1;
+  }
+  .prob-big-quote span { color: var(--accent); }
+  .prob-quem {
+    background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.08);
+    border-radius: 16px; padding: 24px;
+  }
+  .prob-quem h4 {
+    font-family: 'Sora', sans-serif; font-size: .78rem; font-weight: 800;
+    letter-spacing: .1em; text-transform: uppercase; color: var(--accent);
+    margin-bottom: 14px;
+  }
+  .quem-list { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+  .quem-list li { font-size: .85rem; color: rgba(255,255,255,.7); display: flex; align-items: center; gap: 8px; }
+  .quem-list li::before { content: '👤'; font-size: .8rem; }
+
+  /* ===== BENEFÍCIOS ===== */
+  #beneficios { padding: 100px 5%; }
+  .beneficios-grid {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px;
+  }
+  .ben-card {
+    background: var(--gray-light); border-radius: 16px; padding: 28px 20px;
+    transition: transform .25s, box-shadow .25s;
+    border: 1.5px solid transparent;
+  }
+  .ben-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 12px 40px rgba(0,0,0,.09);
+    border-color: rgba(46,204,113,.25);
+  }
+  .ben-icon { font-size: 2rem; margin-bottom: 1rem; }
+  .ben-card h3 {
+    font-family: 'Sora', sans-serif; font-size: .9rem; font-weight: 800;
+    color: var(--navy); margin-bottom: .5rem; text-transform: uppercase; letter-spacing: .04em;
+  }
+  .ben-card p { font-size: .85rem; color: var(--gray); line-height: 1.6; }
+
+  /* ===== SOBRE ===== */
+  #sobre {
+    background: linear-gradient(135deg, #f0faf5 0%, #e8f4fd 100%);
+    padding: 80px 5%;
+    display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center;
+  }
+  .sobre-text h2 {
+    font-family: 'Sora', sans-serif; font-size: clamp(1.5rem,3vw,2.2rem); font-weight: 800;
+    color: var(--navy); margin-bottom: 1rem;
+  }
+  .sobre-text p { color: var(--gray); line-height: 1.8; font-size: .95rem; }
+  .sobre-tags { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 1.5rem; }
+  .tag {
+    background: #fff; border: 1px solid rgba(0,0,0,.08);
+    border-radius: 100px; padding: 6px 14px;
+    font-size: .78rem; font-weight: 600; color: var(--navy);
+  }
+  .sobre-img {
+    border-radius: 20px; overflow: hidden;
+    background: linear-gradient(135deg, var(--navy), #1a7fd4);
+    height: 300px; display: flex; align-items: center; justify-content: center;
+    font-size: 4rem;
+  }
+
+  /* ===== FOOTER ===== */
+  footer {
+    background: var(--navy); color: rgba(255,255,255,.6);
+    padding: 60px 5% 24px;
+  }
+  .footer-grid {
+    display: grid; grid-template-columns: 1.5fr 1fr 1fr 1fr;
+    gap: 40px; margin-bottom: 48px;
+  }
+  .footer-logo {
+    font-family: 'Sora', sans-serif; font-size: 1.3rem; font-weight: 800;
+    color: #fff; margin-bottom: 10px; display: flex; align-items: center; gap: 8px;
+  }
+  .footer-logo span { color: var(--accent); }
+  .footer-desc { font-size: .85rem; line-height: 1.7; margin-bottom: 16px; }
+  .social-row { display: flex; gap: 12px; }
+  .soc {
+    width: 36px; height: 36px; border-radius: 8px;
+    border: 1px solid rgba(255,255,255,.15);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1rem; cursor: pointer; transition: all .2s; color: #fff; text-decoration: none;
+  }
+  .soc:hover { background: rgba(255,255,255,.1); border-color: rgba(255,255,255,.4); }
+  .footer-col h4 {
+    font-family: 'Sora', sans-serif; font-size: .78rem; font-weight: 800;
+    letter-spacing: .1em; text-transform: uppercase; color: #fff;
+    margin-bottom: 14px;
+  }
+  .footer-col ul { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+  .footer-col ul li { font-size: .85rem; }
+  .footer-col ul li a { color: rgba(255,255,255,.55); text-decoration: none; transition: color .2s; }
+  .footer-col ul li a:hover { color: var(--accent); }
+  .contact-item { display: flex; align-items: center; gap: 8px; font-size: .85rem; margin-bottom: 8px; }
+  .contact-item span { font-size: 1rem; }
+  .newsletter { margin-top: 8px; }
+  .newsletter-row {
+    display: flex; gap: 0;
+    background: rgba(255,255,255,.08); border-radius: 8px; overflow: hidden;
+    border: 1px solid rgba(255,255,255,.12);
+  }
+  .newsletter-row input {
+    flex: 1; background: transparent; border: none; outline: none;
+    padding: 10px 14px; font-size: .85rem; color: #fff;
+  }
+  .newsletter-row input::placeholder { color: rgba(255,255,255,.35); }
+  .newsletter-row button {
+    background: var(--green); border: none; color: #fff;
+    padding: 10px 14px; cursor: pointer; transition: background .2s; font-size: 1rem;
+  }
+  .newsletter-row button:hover { background: var(--green-dark); }
+  .footer-bottom {
+    border-top: 1px solid rgba(255,255,255,.08);
+    padding-top: 20px; text-align: center;
+    font-size: .78rem; color: rgba(255,255,255,.3);
+  }
+
+  /* ===== ANIMATIONS ===== */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(40px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-14px); }
+  }
+
+  /* ===== RESPONSIVE ===== */
+  @media (max-width: 900px) {
+    .nav-links { display: none; }
+    #tecnologia { grid-template-columns: 1fr; gap: 40px; }
+    .problema-grid { grid-template-columns: 1fr; }
+    .beneficios-grid { grid-template-columns: 1fr 1fr; }
+    #sobre { grid-template-columns: 1fr; }
+    .footer-grid { grid-template-columns: 1fr 1fr; }
+    .hero-visual { display: none; }
+    .steps::before { display: none; }
+    .sim-metrics { grid-template-columns: 1fr 1fr; }
+  }
+  @media (max-width: 600px) {
+    .beneficios-grid { grid-template-columns: 1fr; }
+    .footer-grid { grid-template-columns: 1fr; }
+    .sim-metrics { grid-template-columns: 1fr; }
+    .hero-stats { flex-direction: column; gap: 1rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav id="navbar">
+  <a href="#" class="logo">
+    <svg class="logo-icon" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="16" cy="16" r="16" fill="#0d1f3c"/>
+      <path d="M16 6 C16 6 9 14 9 19 C9 22.9 12.1 26 16 26 C19.9 26 23 22.9 23 19 C23 14 16 6 16 6Z" fill="#2ecc71"/>
+      <path d="M16 18 C14 16 13 13 14 11 C11 13 9 15.8 9 19 C9 22.9 12.1 26 16 26 C16 26 13 23 16 18Z" fill="#27ae60"/>
+    </svg>
+    HYDRO<span>SYNC</span>
+  </a>
+  <ul class="nav-links">
+    <li><a href="#hero">Início</a></li>
+    <li><a href="#como-funciona">Como funciona</a></li>
+    <li><a href="#tecnologia">Tecnologia</a></li>
+    <li><a href="#simulacao">Simulação</a></li>
+    <li><a href="#problema">O problema</a></li>
+    <li><a href="#beneficios">Benefícios</a></li>
+    <li><a href="#sobre">Sobre</a></li>
+    <li><a href="#footer">Contato</a></li>
+  </ul>
+<a href="simulacao.html" class="btn-nav">Simular plantação</a>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-content">
+    <div class="hero-badge">
+      💧 Tecnologia para o semiárido
+    </div>
+    <h1>HYDRO<span>SYNC</span></h1>
+    <p class="hero-tagline">Cada gota no momento certo.</p>
+    <p class="hero-desc">Transformamos a umidade do ar em água e usamos inteligência para irrigar com precisão no semiárido.</p>
+    <div class="hero-btns">
+      <a href="#como-funciona" class="btn-primary">Ver como funciona →</a>
+      <a href="#simulacao" class="btn-outline">🌱 Simular plantação</a>
+    </div>
+  </div>
+
+  <!-- Illustrative tower SVG -->
+  <div class="hero-visual">
+    <svg viewBox="0 0 500 600" xmlns="http://www.w3.org/2000/svg" class="hero-tower" style="width:360px;opacity:.9">
+      <!-- Sky glow -->
+      <ellipse cx="250" cy="500" rx="220" ry="60" fill="rgba(46,204,113,0.08)"/>
+      <!-- Tower base -->
+      <rect x="220" y="350" width="60" height="200" fill="#1a3a5c" rx="4"/>
+      <!-- Tank -->
+      <ellipse cx="250" cy="350" rx="55" ry="15" fill="#1a7fd4"/>
+      <rect x="195" y="290" width="110" height="62" fill="#2196f3" rx="6"/>
+      <ellipse cx="250" cy="290" rx="55" ry="14" fill="#42a5f5"/>
+      <!-- Tower legs -->
+      <line x1="250" y1="290" x2="190" y2="400" stroke="#0d3a5c" stroke-width="10" stroke-linecap="round"/>
+      <line x1="250" y1="290" x2="310" y2="400" stroke="#0d3a5c" stroke-width="10" stroke-linecap="round"/>
+      <line x1="250" y1="290" x2="230" y2="400" stroke="#0d3a5c" stroke-width="7" stroke-linecap="round"/>
+      <line x1="250" y1="290" x2="270" y2="400" stroke="#0d3a5c" stroke-width="7" stroke-linecap="round"/>
+      <!-- Cross bars -->
+      <line x1="200" y1="340" x2="300" y2="340" stroke="#0d3a5c" stroke-width="5"/>
+      <line x1="208" y1="370" x2="292" y2="370" stroke="#0d3a5c" stroke-width="4"/>
+      <!-- Solar panels on top -->
+      <rect x="160" y="240" width="80" height="44" fill="#1565c0" rx="4" transform="rotate(-15 200 262)"/>
+      <rect x="260" y="240" width="80" height="44" fill="#1565c0" rx="4" transform="rotate(15 300 262)"/>
+      <!-- Panel lines -->
+      <line x1="168" y1="248" x2="232" y2="238" stroke="#42a5f5" stroke-width="1" opacity=".6"/>
+      <line x1="168" y1="258" x2="232" y2="248" stroke="#42a5f5" stroke-width="1" opacity=".6"/>
+      <line x1="168" y1="268" x2="232" y2="258" stroke="#42a5f5" stroke-width="1" opacity=".6"/>
+      <line x1="268" y1="238" x2="332" y2="248" stroke="#42a5f5" stroke-width="1" opacity=".6"/>
+      <line x1="268" y1="248" x2="332" y2="258" stroke="#42a5f5" stroke-width="1" opacity=".6"/>
+      <line x1="268" y1="258" x2="332" y2="268" stroke="#42a5f5" stroke-width="1" opacity=".6"/>
+      <!-- Antennas -->
+      <line x1="250" y1="290" x2="210" y2="200" stroke="#90caf9" stroke-width="3"/>
+      <circle cx="210" cy="200" r="8" fill="none" stroke="#90caf9" stroke-width="2"/>
+      <line x1="250" y1="290" x2="290" y2="210" stroke="#90caf9" stroke-width="3"/>
+      <circle cx="290" cy="210" r="6" fill="none" stroke="#90caf9" stroke-width="2"/>
+      <!-- Ground tanks -->
+      <ellipse cx="170" cy="490" rx="36" ry="12" fill="#0d3a5c"/>
+      <rect x="134" y="450" width="72" height="40" fill="#1a4a6e" rx="6"/>
+      <ellipse cx="170" cy="450" rx="36" ry="11" fill="#2196f3" opacity=".6"/>
+      <ellipse cx="330" cy="490" rx="28" ry="9" fill="#0d3a5c"/>
+      <rect x="302" y="458" width="56" height="32" fill="#1a4a6e" rx="5"/>
+      <ellipse cx="330" cy="458" rx="28" ry="8" fill="#2196f3" opacity=".6"/>
+      <!-- Drip lines -->
+      <path d="M206 490 Q250 520 190 540" stroke="#2ecc71" stroke-width="2" fill="none" opacity=".5" stroke-dasharray="4 4"/>
+      <path d="M294 490 Q260 510 310 535" stroke="#2ecc71" stroke-width="2" fill="none" opacity=".5" stroke-dasharray="4 4"/>
+      <!-- Water drops -->
+      <circle cx="188" cy="543" r="3" fill="#4fc3f7" opacity=".8"/>
+      <circle cx="312" cy="538" r="3" fill="#4fc3f7" opacity=".8"/>
+      <!-- Sunlight rays -->
+      <line x1="400" y1="80" x2="430" y2="60" stroke="#ffd54f" stroke-width="2" opacity=".4"/>
+      <line x1="410" y1="90" x2="450" y2="80" stroke="#ffd54f" stroke-width="2" opacity=".4"/>
+      <line x1="395" y1="105" x2="440" y2="105" stroke="#ffd54f" stroke-width="2" opacity=".4"/>
+      <circle cx="390" cy="90" r="28" fill="#ffcc02" opacity=".18"/>
+      <circle cx="390" cy="90" r="20" fill="#ffd54f" opacity=".35"/>
+    </svg>
+  </div>
+
+  <div class="hero-stats">
+    <div class="stat">
+      <div class="stat-val">95%</div>
+      <div class="stat-lbl">Eficiência hídrica</div>
+    </div>
+    <div class="stat">
+      <div class="stat-val">24/7</div>
+      <div class="stat-lbl">Monitoramento IoT</div>
+    </div>
+    <div class="stat">
+      <div class="stat-val">100%</div>
+      <div class="stat-lbl">Energia solar</div>
+    </div>
+  </div>
+</section>
+
+<!-- COMO FUNCIONA -->
+<section id="como-funciona">
+  <div class="section-tag"><span>Como funciona</span></div>
+  <h2 class="section-title">Da captação à irrigação inteligente</h2>
+  <div class="steps">
+    <div class="step">
+      <div class="step-icon">
+        <svg width="40" height="40" viewBox="0 0 40 40" fill="none"><circle cx="20" cy="20" r="20" fill="#1a7fd4" opacity=".12"/><path d="M10 20 C14 14 20 12 26 14 C28 9 34 9 34 15 C37 15 37 20 34 20 Z" fill="#1a7fd4"/><path d="M8 24 C8 24 12 20 20 20 L20 28 C14 28 8 24 8 24Z" fill="#1a7fd4" opacity=".5"/></svg>
+        <div class="step-num">1</div>
+      </div>
+      <h3>Captação</h3>
+      <p>O ar é captado pela torre inteligente com sensores atmosféricos.</p>
+    </div>
+    <div class="step">
+      <div class="step-icon">
+        <svg width="40" height="40" viewBox="0 0 40 40" fill="none"><circle cx="20" cy="20" r="20" fill="#2ecc71" opacity=".12"/><path d="M20 8 C20 8 13 16 13 21 C13 24.9 16.1 28 20 28 C23.9 28 27 24.9 27 21 C27 16 20 8 20 8Z" fill="#1a7fd4"/></svg>
+        <div class="step-num">2</div>
+      </div>
+      <h3>Condensação</h3>
+      <p>O vapor é resfriado e transformado em água pura.</p>
+    </div>
+    <div class="step">
+      <div class="step-icon">
+        <svg width="40" height="40" viewBox="0 0 40 40" fill="none"><circle cx="20" cy="20" r="20" fill="#1a7fd4" opacity=".12"/><rect x="12" y="12" width="16" height="16" rx="4" fill="none" stroke="#1a7fd4" stroke-width="2"/><circle cx="20" cy="20" r="4" fill="#1a7fd4"/></svg>
+        <div class="step-num">3</div>
+      </div>
+      <h3>Filtração</h3>
+      <p>A água passa por filtros e fica pronta para uso.</p>
+    </div>
+    <div class="step">
+      <div class="step-icon">
+        <svg width="40" height="40" viewBox="0 0 40 40" fill="none"><circle cx="20" cy="20" r="20" fill="#2ecc71" opacity=".12"/><path d="M14 28 L14 18 Q20 10 26 18 L26 28" fill="none" stroke="#2ecc71" stroke-width="2" stroke-linecap="round"/><circle cx="14" cy="30" r="2" fill="#2ecc71"/><circle cx="20" cy="32" r="2" fill="#2ecc71"/><circle cx="26" cy="30" r="2" fill="#2ecc71"/></svg>
+        <div class="step-num">4</div>
+      </div>
+      <h3>Irrigação Inteligente</h3>
+      <p>Sensores analisam o solo e decidem o momento ideal da irrigação.</p>
+    </div>
+  </div>
+</section>
+
+<!-- TECNOLOGIA -->
+<section id="tecnologia">
+  <div class="tech-text">
+    <h2>Tecnologia que Transforma</h2>
+    <p>O HydroSync combina energia solar, sensores de solo e automação para garantir eficiência máxima no uso da água.</p>
+    <ul class="feature-list">
+      <li>Sensores de umidade e temperatura</li>
+      <li>Controle automático de irrigação</li>
+      <li>Energia limpa e renovável</li>
+      <li>Monitoramento em tempo real via IoT</li>
+    </ul>
+    <a href="#simulacao" class="btn-green">Saiba mais →</a>
+  </div>
+
+  <div class="phone-wrap">
+    <div class="glow-ring"></div>
+    <div class="phone">
+      <div class="phone-inner">
+        <div class="phone-header">
+          <div class="phone-logo">HYDRO<span>SYNC</span></div>
+          <div class="status-dot"></div>
+        </div>
+        <div class="phone-status">Status do sistema: <strong>Ativo</strong></div>
+        <div class="phone-metric">
+          <div class="metric-lbl">Umidade do solo</div>
+          <div class="metric-val">32%</div>
+          <div class="metric-bar"><div class="metric-fill" style="width:32%"></div></div>
+        </div>
+        <div class="phone-metric">
+          <div class="metric-lbl">Água disponível</div>
+          <div class="metric-val">120 L</div>
+          <div class="metric-bar"><div class="metric-fill" style="width:60%"></div></div>
+        </div>
+        <div class="phone-next">Próxima irrigação: <strong>Amanhã – 06:00</strong></div>
+        <div class="solar-row">
+          <div class="solar-lbl">Energia solar</div>
+          <div class="solar-val">95%</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SIMULAÇÃO -->
+<section id="simulacao">
+  <div class="section-tag"><span>Simulação de Plantação</span></div>
+  <h2 class="section-title">Veja sua plantação em tempo real</h2>
+  <div class="sim-card">
+    <h3>Dados da Simulação</h3>
+    <div class="sim-row">
+      <div class="sim-chip"><div class="chip-icon">🌱</div><div><div class="chip-lbl">Cultura</div><div class="chip-val">Milho</div></div></div>
+      <div class="sim-chip"><div class="chip-icon">☀️</div><div><div class="chip-lbl">Clima</div><div class="chip-val">Semiárido</div></div></div>
+      <div class="sim-chip"><div class="chip-icon">🌿</div><div><div class="chip-lbl">Área</div><div class="chip-val">1,0 hectare</div></div></div>
+    </div>
+    <div class="sim-metrics">
+      <div class="sim-metric">
+        <div class="lbl">Umidade do solo</div>
+        <div class="val">32%</div>
+        <div class="sub">Ideal: 30% – 60%</div>
+        <div class="bar"><div class="fill-blue" style="width:32%"></div></div>
+      </div>
+      <div class="sim-metric">
+        <div class="lbl">Água disponível</div>
+        <div class="val">120 L</div>
+        <div class="sub">Capacidade: 200 L</div>
+        <div class="bar"><div class="fill-blue" style="width:60%"></div></div>
+      </div>
+      <div class="sim-metric">
+        <div class="lbl">Status do sistema</div>
+        <div class="val" style="font-size:.95rem">Irrigação ativada</div>
+        <div style="margin-top:8px"><span class="tag-active">✓ Sistema funcionando</span></div>
+      </div>
+    </div>
+    <div class="sim-footer">
+      <div class="next-irr">📅 Próxima irrigação: <strong>Amanhã – 06:00</strong></div>
+    <button class="btn-primary" style="font-size:.85rem;padding:12px 22px"
+onclick="window.location.href='simulacao.html'">
+  Simular cenário
+</button>
+    </div>
+  </div>
+</section>
+
+<!-- O PROBLEMA -->
+<section id="problema">
+  <div class="problema-header">O Problema</div>
+  <div class="problema-grid">
+    <div style="display:flex;flex-direction:column;gap:16px">
+      <div class="prob-stat-big">
+        <div class="prob-stat-icon">💧</div>
+        <div class="prob-stat-val">80%</div>
+        <div class="prob-stat-desc">dos municípios brasileiros já enfrentaram seca nos últimos anos.</div>
+        <div class="prob-stat-source">Fonte: Monitor de Secas – ANA (2024)</div>
+      </div>
+      <div class="prob-stat-big">
+        <div class="prob-stat-icon">🌡️</div>
+        <div class="prob-stat-val accent">+2,0°C</div>
+        <div class="prob-stat-desc">é o aumento médio da temperatura no Nordeste até 2036.</div>
+        <div class="prob-stat-source">Fonte: INPE (2023)</div>
+      </div>
+    </div>
+    <div class="prob-center">
+      <div class="prob-center-text">
+        Até 2036, o cenário tende a piorar: <span class="prob-center-hl">menos chuva, mais calor e menos produção.</span>
+        <br><br>
+        O agricultor do semiárido já enfrenta os efeitos — e precisa de soluções agora.
+      </div>
+    </div>
+    <div class="prob-quem">
+      <h4>Quem sofre?</h4>
+      <ul class="quem-list">
+        <li>Pequenos agricultores</li>
+        <li>Comunidades do semiárido</li>
+        <li>Economia local</li>
+        <li>Produção de alimentos</li>
+      </ul>
+    </div>
+  </div>
+  <div class="prob-big-quote">
+    Não é só falta de água. É falta de <span>controle</span> sobre ela.
+  </div>
+</section>
+
+<!-- BENEFÍCIOS -->
+<section id="beneficios">
+  <div class="section-tag"><span>Benefícios do HydroSync</span></div>
+  <h2 class="section-title">Por que escolher o HydroSync</h2>
+  <div class="beneficios-grid">
+    <div class="ben-card">
+      <div class="ben-icon">💧</div>
+      <h3>Economia de Água</h3>
+      <p>Uso inteligente e eficiente dos recursos hídricos com precisão milimétrica.</p>
+    </div>
+    <div class="ben-card">
+      <div class="ben-icon">⚡</div>
+      <h3>Energia Limpa</h3>
+      <p>Movido por energia solar, sustentável e renovável, sem custo de combustível.</p>
+    </div>
+    <div class="ben-card">
+      <div class="ben-icon">🌱</div>
+      <h3>Maior Produtividade</h3>
+      <p>Irrigação no momento certo aumenta a produção e qualidade da colheita.</p>
+    </div>
+    <div class="ben-card">
+      <div class="ben-icon">📊</div>
+      <h3>Menos Desperdício</h3>
+      <p>Tecnologia que reduz perdas e aumenta a eficiência do sistema hídrico.</p>
+    </div>
+  </div>
+</section>
+
+<!-- SOBRE -->
+<section id="sobre">
+  <div class="sobre-text">
+    <h2>Sobre o Projeto</h2>
+    <p>O HydroSync é uma solução inovadora que une tecnologia, sustentabilidade e impacto social para transformar a realidade do semiárido brasileiro. Desenvolvido para pequenos e médios agricultores que enfrentam a escassez hídrica diariamente.</p>
+    <div class="sobre-tags">
+      <span class="tag">🌍 Impacto Social</span>
+      <span class="tag">♻️ Sustentabilidade</span>
+      <span class="tag">🤖 IoT & IA</span>
+      <span class="tag">☀️ Energia Solar</span>
+    </div>
+  </div>
+  <div class="sobre-img">🌱
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer id="footer">
+  <div class="footer-grid">
+    <div>
+      <div class="footer-logo">
+        <svg width="28" height="28" viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="16" fill="rgba(255,255,255,0.1)"/><path d="M16 6 C16 6 9 14 9 19 C9 22.9 12.1 26 16 26 C19.9 26 23 22.9 23 19 C23 14 16 6 16 6Z" fill="#00e5a0"/></svg>
+        HYDRO<span>SYNC</span>
+      </div>
+      <div class="footer-desc">Tecnologia para um futuro sustentável.</div>
+      <div class="social-row">
+        <a class="soc" href="#">𝕚</a>
+        <a class="soc" href="#">in</a>
+        <a class="soc" href="#">✉</a>
+      </div>
+    </div>
+    <div class="footer-col">
+      <h4>Sobre o Projeto</h4>
+      <p style="font-size:.83rem;line-height:1.7">O HydroSync é uma solução inovadora que une tecnologia, sustentabilidade e impacto social para transformar a realidade do semiárido brasileiro.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Contato</h4>
+      <div class="contact-item"><span>✉</span> contato@hydrosync.com.br</div>
+      <div class="contact-item"><span>📞</span> (77) 3441-0000</div>
+      <div class="contact-item"><span>📍</span> Brumado – BA, Brasil</div>
+    </div>
+    <div class="footer-col">
+      <h4>Receba Novidades</h4>
+      <div class="newsletter">
+        <div class="newsletter-row">
+          <input type="email" placeholder="Digite seu e-mail">
+          <button>→</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="footer-bottom">© 2024 HydroSync. Todos os direitos reservados.</div>
+</footer>
+
+<script>
+  // Nav scroll effect
+  const nav = document.getElementById('navbar');
+  window.addEventListener('scroll', () => {
+    nav.classList.toggle('scrolled', window.scrollY > 20);
+  });
+
+  // Intersection observer for step animation
+  const steps = document.querySelectorAll('.step');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((e, i) => {
+      if (e.isIntersecting) {
+        setTimeout(() => e.target.classList.add('visible'), i * 150);
+      }
+    });
+  }, { threshold: 0.2 });
+  steps.forEach(s => observer.observe(s));
+
+  // Animate numbers on scroll
+  const stats = document.querySelectorAll('.stat-val');
+  const statObs = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.style.animation = 'fadeUp .6s ease both';
+      }
+    });
+  }, { threshold: 0.5 });
+  stats.forEach(s => statObs.observe(s));
+</script>
+</body>
+</html>
